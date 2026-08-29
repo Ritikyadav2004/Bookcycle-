@@ -9,6 +9,13 @@ const apiLimiter = require('./middleware/rateLimiter');
 const errorHandler = require('./middleware/errorMiddleware');
 const AppError = require('./utils/appError');
 const authRoutes = require('./routes/authRoutes');
+const sellerRoutes = require('./routes/sellerRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const bookRoutes = require('./routes/bookRoutes');
+const cartRoutes = require('./routes/cartRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 
 dotenv.config();
 
@@ -40,6 +47,27 @@ app.use(apiLimiter);
 
 // Auth routes
 app.use('/api/auth', authRoutes);
+
+// Seller routes
+app.use('/api/seller', sellerRoutes);
+
+// Admin routes
+app.use('/api/admin', adminRoutes);
+
+// Book catalog routes
+app.use('/api/books', bookRoutes);
+
+// Cart routes
+app.use('/api/cart', cartRoutes);
+
+// Order routes
+app.use('/api/orders', orderRoutes);
+
+// Review routes
+app.use('/api/reviews', reviewRoutes);
+
+// Recommendation routes
+app.use('/api/recommendations', recommendationRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

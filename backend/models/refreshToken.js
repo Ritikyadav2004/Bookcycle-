@@ -26,7 +26,6 @@ const refreshTokenSchema = new mongoose.Schema(
   }
 );
 
-refreshTokenSchema.index({ tokenHash: 1 });
 refreshTokenSchema.index({ user: 1 });
 
 const RefreshToken = mongoose.model("RefreshToken", refreshTokenSchema);

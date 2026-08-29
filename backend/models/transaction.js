@@ -50,7 +50,6 @@ const transactionSchema = new mongoose.Schema(
   }
 );
 
-transactionSchema.index({ transactionId: 1 });
 transactionSchema.index({ order: 1 });
 transactionSchema.index({ buyer: 1 });
 transactionSchema.index({ seller: 1 });

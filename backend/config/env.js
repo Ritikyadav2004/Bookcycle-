@@ -19,6 +19,9 @@
 
 // module.exports = validateEnvironment;
 
+
+
+
 const requiredEnvVariables = ["MONGODB_URI"];
 
 const validateEnvironment = () => {
