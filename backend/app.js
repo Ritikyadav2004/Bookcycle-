@@ -3,10 +3,12 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 
 const apiLimiter = require('./middleware/rateLimiter');
 const errorHandler = require('./middleware/errorMiddleware');
 const AppError = require('./utils/appError');
+const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
 
@@ -14,6 +16,9 @@ const app = express();
 
 // Set security headers
 app.use(helmet());
+
+// Cookie parser middleware
+app.use(cookieParser());
 
 // Enable CORS
 app.use(cors({
@@ -32,6 +37,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Global rate limiting
 app.use(apiLimiter);
+
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
