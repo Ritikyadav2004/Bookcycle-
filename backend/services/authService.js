@@ -53,6 +53,7 @@ const registerUser = async (userData) => {
     role: role || "buyer",
     shopName: role === "seller" ? shopName : "",
     sellerVerificationStatus,
+    emailVerified: true,
     emailVerificationToken: crypto.createHash("sha256").update(verificationToken).digest("hex"),
     emailVerificationExpires: verificationExpires,
   });

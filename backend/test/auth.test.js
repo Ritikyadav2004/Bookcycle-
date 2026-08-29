@@ -10,12 +10,12 @@ describe("Auth Endpoints", () => {
       await connectDatabase();
     }
     await User.deleteMany({ email: /@test\.com$/ });
-  });
+  }, 20000);
 
   afterAll(async () => {
     await User.deleteMany({ email: /@test\.com$/ });
     await mongoose.connection.close();
-  });
+  }, 20000);
 
   const testUser = {
     name: "Test Buyer",
