@@ -21,5 +21,6 @@ router.get("/verify-email", authController.verify);
 // Protected routes
 router.post("/change-password", protect, changePasswordValidator, authController.change);
 router.get("/me", protect, authController.getMe);
+router.put("/profile", protect, authController.updateProfile);
 
 module.exports = router;

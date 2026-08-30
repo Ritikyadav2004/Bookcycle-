@@ -68,7 +68,7 @@ const loginUser = async ({ email, password }) => {
   // Find user and select password
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    throw new AppError("Invalid email or password", 401);
+    throw new AppError("This email is not registered. Please sign up first.", 404);
   }
 
   // Check if account status is active

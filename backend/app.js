@@ -29,7 +29,10 @@ app.use(cookieParser());
 
 // Enable CORS
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    return callback(null, origin);
+  },
   credentials: true,
 }));
 
@@ -56,6 +59,7 @@ app.use('/api/admin', adminRoutes);
 
 // Book catalog routes
 app.use('/api/books', bookRoutes);
+app.use('/api/products', bookRoutes);
 
 // Cart routes
 app.use('/api/cart', cartRoutes);
