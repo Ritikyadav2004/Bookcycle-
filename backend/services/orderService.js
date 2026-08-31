@@ -9,7 +9,7 @@ const paymentService = require("./paymentService");
 const crypto = require("crypto");
 
 const checkoutCart = async (buyerId, checkoutData) => {
-  const { paymentMethod, paymentDetails, shippingAddress } = checkoutData;
+  const { paymentMethod, paymentDetails, shippingAddress } = checkoutData || {};
 
   if (!shippingAddress || !shippingAddress.fullName || !shippingAddress.addressLine || !shippingAddress.city || !shippingAddress.state || !shippingAddress.postalCode) {
     throw new AppError("Shipping address is incomplete", 400);

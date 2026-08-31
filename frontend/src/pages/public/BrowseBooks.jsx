@@ -120,10 +120,10 @@ const BrowseBooks = () => {
           <AnimatePresence>
             {(isFilterOpen || isDesktop) && (
               <motion.aside 
-                initial={{ opacity: 0, x: -50, width: 0 }}
-                animate={{ opacity: 1, x: 0, width: '100%' }}
-                exit={{ opacity: 0, x: -50, width: 0 }}
-                className={`lg:w-72 shrink-0 ${isFilterOpen ? 'fixed inset-0 z-50 bg-white p-6 overflow-y-auto' : 'hidden lg:block'}`}
+                initial={isFilterOpen ? { opacity: 0, x: -50 } : { opacity: 1 }}
+                animate={isFilterOpen ? { opacity: 1, x: 0 } : { opacity: 1 }}
+                exit={isFilterOpen ? { opacity: 0, x: -50 } : {}}
+                className={`lg:w-72 shrink-0 ${isFilterOpen ? 'fixed inset-0 z-50 bg-white p-6 overflow-y-auto w-full' : 'hidden lg:block'}`}
               >
                 {isFilterOpen && (
                   <div className="flex justify-between items-center mb-6 lg:hidden">

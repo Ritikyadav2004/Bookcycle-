@@ -13,7 +13,7 @@ const getStats = async (req, res, next) => {
 const updateUserStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status } = req.body; // active, blocked, suspended
+    const { status } = req.body || {}; // active, blocked, suspended
     const user = await adminService.updateUserStatus(id, status);
     return sendSuccess(res, `User status updated to ${status} successfully`, { user });
   } catch (error) {
@@ -24,7 +24,7 @@ const updateUserStatus = async (req, res, next) => {
 const verifySeller = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status } = req.body; // approved, rejected
+    const { status } = req.body || {}; // approved, rejected
     const seller = await adminService.verifySeller(id, status);
     return sendSuccess(res, `Seller verification request resolved: ${status}`, { seller });
   } catch (error) {
@@ -35,7 +35,7 @@ const verifySeller = async (req, res, next) => {
 const reviewBookListing = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status, rejectionReason } = req.body; // approved, rejected
+    const { status, rejectionReason } = req.body || {}; // approved, rejected
     const book = await adminService.reviewBookListing(id, status, rejectionReason);
     return sendSuccess(res, `Book listing review completed: ${status}`, { book });
   } catch (error) {

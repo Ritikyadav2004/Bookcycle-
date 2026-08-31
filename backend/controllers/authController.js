@@ -29,7 +29,7 @@ const clearTokenCookies = (res) => {
 
 const register = async (req, res, next) => {
   try {
-    const { name, email, mobile, password, role, shopName } = req.body;
+    const { name, email, mobile, password, role, shopName } = req.body || {};
     const { user } = await authService.registerUser({
       name,
       email,
@@ -54,7 +54,7 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
     const { user, accessToken, refreshToken } = await authService.loginUser({
       email,
       password,
@@ -78,7 +78,7 @@ const login = async (req, res, next) => {
 
 const adminLogin = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
     const { user, accessToken, refreshToken } = await authService.loginAdmin({
       email,
       password,
@@ -103,7 +103,7 @@ const adminLogin = async (req, res, next) => {
 const refresh = async (req, res, next) => {
   try {
     // Read from cookies or request body
-    const token = req.cookies.refresh_token || req.body.refreshToken;
+    const token = req.cookies.refresh_token || (req.body || {}).refreshToken;
     if (!token) {
       return next(new AppError("Refresh token is required", 400));
     }
@@ -122,7 +122,7 @@ const refresh = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    const token = req.cookies.refresh_token || req.body.refreshToken;
+    const token = req.cookies.refresh_token || (req.body || {}).refreshToken;
     if (token) {
       await authService.logoutUser(token);
     }
@@ -137,7 +137,7 @@ const logout = async (req, res, next) => {
 
 const forgot = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { email } = req.body || {};
     if (!email) {
       return next(new AppError("Email is required", 400));
     }
@@ -155,7 +155,7 @@ const forgot = async (req, res, next) => {
 
 const reset = async (req, res, next) => {
   try {
-    const { token, password } = req.body;
+    const { token, password } = req.body || {};
     if (!token || !password) {
       return next(new AppError("Token and password are required", 400));
     }
@@ -170,7 +170,7 @@ const reset = async (req, res, next) => {
 
 const verify = async (req, res, next) => {
   try {
-    const token = req.query.token || req.body.token;
+    const token = req.query.token || (req.body || {}).token;
     if (!token) {
       return next(new AppError("Verification token is required", 400));
     }
@@ -185,7 +185,7 @@ const verify = async (req, res, next) => {
 
 const change = async (req, res, next) => {
   try {
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body || {};
     await authService.changePassword(req.user._id, currentPassword, newPassword);
 
     clearTokenCookies(res);

@@ -12,7 +12,7 @@ const getCart = async (req, res, next) => {
 
 const addItem = async (req, res, next) => {
   try {
-    const { bookId, quantity } = req.body;
+    const { bookId, quantity } = req.body || {};
     const qty = quantity ? Number(quantity) : 1;
     const data = await cartService.addToCart(req.user._id, bookId, qty);
     return sendSuccess(res, "Item added to cart successfully", data);
@@ -24,7 +24,7 @@ const addItem = async (req, res, next) => {
 const updateItem = async (req, res, next) => {
   try {
     const { bookId } = req.params;
-    const { quantity } = req.body;
+    const { quantity } = req.body || {};
     const data = await cartService.updateCartItemQuantity(req.user._id, bookId, Number(quantity));
     return sendSuccess(res, "Cart item quantity updated successfully", data);
   } catch (error) {
