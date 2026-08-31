@@ -11,6 +11,10 @@ const crypto = require("crypto");
 const checkoutCart = async (buyerId, checkoutData) => {
   const { paymentMethod, paymentDetails, shippingAddress } = checkoutData || {};
 
+  if (!paymentMethod || paymentMethod.toUpperCase() !== "COD") {
+    throw new AppError("Only Cash on Delivery (COD) payment method is allowed", 400);
+  }
+
   if (!shippingAddress || !shippingAddress.fullName || !shippingAddress.addressLine || !shippingAddress.city || !shippingAddress.state || !shippingAddress.postalCode) {
     throw new AppError("Shipping address is incomplete", 400);
   }
