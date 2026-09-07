@@ -1,0 +1,75 @@
+import useAuthStore from '../store/authStore';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
+const getHeaders = () => {
+  const token = useAuthStore.getState().token;
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
+
+export const getProducts = (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const url = `${BASE_URL}/products${query ? `?${query}` : ''}`;
+  return fetch(url, {
+    headers: getHeaders()
+  }).then(res => {
+    if (!res.ok) throw new Error('Failed to fetch products');
+    return res.json();
+  }).then(json => {
+    const books = (json.data || []).map(b => ({
+      ...b,
+      id: b._id || b.id,
+      category: b.category?.name || b.category || 'General',
+      image: b.images?.[0] || b.image || '/book-images/placeholder.webp'
+    }));
+    return {
+      data: books,
+      totalPages: json.pagination?.pages || 1
+    };
+  });
+};
+
+export const getProduct = (id) => {
+  return fetch(`${BASE_URL}/products/${id}`, {
+    headers: getHeaders()
+  }).then(res => {
+    if (!res.ok) throw new Error('Failed to fetch book details');
+    return res.json();
+  }).then(json => {
+    const book = json.data?.book || json.data || {};
+    return {
+      ...book,
+      id: book._id || book.id,
+      category: book.category?.name || book.category || 'General',
+      image: book.images?.[0] || book.image || '/book-images/placeholder.webp'
+    };
+  });
+};
+
+export const addToCart = (item) => {
+  return fetch(`${BASE_URL}/cart/add`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(item)
+  }).then(res => {
+    if (!res.ok) throw new Error('Failed to add item to cart');
+    return res.json();
+  });
+};
+
+export const checkoutCOD = (order) => {
+  return fetch(`${BASE_URL}/orders/checkout`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(order)
+  }).then(res => {
+    if (!res.ok) throw new Error('Failed to checkout');
+    return res.json();
+  });
+};
