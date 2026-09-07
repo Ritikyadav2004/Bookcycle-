@@ -160,7 +160,7 @@ const getReceivedOrderDetails = async (req, res, next) => {
 const confirmOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { note } = req.body;
+    const { note } = req.body || {};
     const order = await sellerService.confirmReceivedOrder(req.user._id, id, note);
     return sendSuccess(res, "Order confirmed successfully", { order });
   } catch (error) {
@@ -171,7 +171,7 @@ const confirmOrder = async (req, res, next) => {
 const packOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { note } = req.body;
+    const { note } = req.body || {};
     const order = await sellerService.packReceivedOrder(req.user._id, id, note);
     return sendSuccess(res, "Order packed successfully", { order });
   } catch (error) {
@@ -182,7 +182,7 @@ const packOrder = async (req, res, next) => {
 const shipOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { courierName, trackingNumber, note } = req.body;
+    const { courierName, trackingNumber, note } = req.body || {};
     const order = await sellerService.shipReceivedOrder(req.user._id, id, {
       courierName,
       trackingNumber,

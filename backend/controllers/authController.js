@@ -39,7 +39,15 @@ const register = async (req, res, next) => {
       shopName,
     });
 
-    return sendSuccess(res, "Registration successful. Please verify your email.", {
+    const jwt = require("jsonwebtoken");
+    const accessToken = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "your_development_jwt_secret",
+      { expiresIn: process.env.JWT_EXPIRES_IN || "15m" }
+    );
+
+    return sendSuccess(res, "Registration successful.", {
+      token: accessToken,
       user: {
         id: user._id,
         name: user.name,
@@ -196,6 +204,42 @@ const change = async (req, res, next) => {
   }
 };
 
+const updateProfile = async (req, res, next) => {
+  try {
+    const { name, email, mobile, city } = req.body;
+    
+    if (email && email !== req.user.email) {
+      const existing = await User.findOne({ email });
+      if (existing) {
+        throw new AppError("Email is already taken", 400);
+      }
+    }
+    
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (mobile) updateData.mobile = mobile;
+    if (city) updateData.city = city;
+    
+    const user = await User.findByIdAndUpdate(req.user._id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+    
+    return sendSuccess(res, "Profile updated successfully", {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        mobile: user.mobile,
+        role: user.role,
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getMe = async (req, res, next) => {
   try {
     // req.user is attached via protect middleware
@@ -226,4 +270,5 @@ module.exports = {
   verify,
   change,
   getMe,
+  updateProfile,
 };
