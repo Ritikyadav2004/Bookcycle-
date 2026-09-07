@@ -9,7 +9,7 @@ const paymentService = require("./paymentService");
 const crypto = require("crypto");
 
 const checkoutCart = async (buyerId, checkoutData) => {
-  const { paymentMethod, paymentDetails, shippingAddress } = checkoutData;
+  const { paymentMethod, paymentDetails, shippingAddress } = checkoutData || {};
 
   if (!paymentMethod || paymentMethod.toUpperCase() !== "COD") {
     throw new AppError("Only Cash on Delivery (COD) payment method is allowed", 400);

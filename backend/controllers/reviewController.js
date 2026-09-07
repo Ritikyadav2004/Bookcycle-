@@ -23,7 +23,7 @@ const getBookReviews = async (req, res, next) => {
 const moderateReview = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status } = req.body || {};
     const review = await reviewService.moderateReview(id, status);
     return sendSuccess(res, `Review status updated to ${status} successfully`, { review });
   } catch (error) {
