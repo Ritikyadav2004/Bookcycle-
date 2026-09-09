@@ -93,6 +93,10 @@ const router = createBrowserRouter([
           { path: 'buyer/register', element: withSuspense(<BuyerRegister />) },
           { path: 'seller/register', element: withSuspense(<SellerRegister />) },
           { path: 'admin/login', element: withSuspense(<AdminLogin />) },
+          { path: 'auth/login', element: withSuspense(<RoleSelector />) },
+          { path: 'auth/buyer/login', element: withSuspense(<BuyerLogin />) },
+          { path: 'auth/seller/login', element: withSuspense(<SellerLogin />) },
+          { path: 'auth/admin/login', element: withSuspense(<AdminLogin />) },
           { path: 'forgot-password', element: withSuspense(<ForgotPassword />) },
           { path: 'reset-password', element: withSuspense(<ResetPassword />) },
         ]
