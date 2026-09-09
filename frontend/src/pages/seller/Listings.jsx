@@ -18,7 +18,7 @@ const Listings = () => {
     try {
       setLoading(true);
       const data = await sellerService.getBooks();
-      setListings(Array.isArray(data) ? data : []);
+      setListings(Array.isArray(data) ? data : (data?.listings || []));
     } catch (err) {
       console.error('Failed to load listings:', err);
       toast.error('Failed to load your listings');

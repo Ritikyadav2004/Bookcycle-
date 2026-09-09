@@ -19,9 +19,21 @@ const SellerLogin = () => {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/seller/dashboard';
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: 'seller1@test.com',
+      password: 'sellerpassword123',
+    },
   });
+
+  const handleAutoFill = () => {
+    reset({
+      email: 'seller1@test.com',
+      password: 'sellerpassword123',
+    });
+    toast.success('Seller test credentials pre-filled!');
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -36,12 +48,21 @@ const SellerLogin = () => {
 
   return (
     <div className="w-full">
-      <div className="mb-10 text-center md:text-left">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-amber/20 text-amber-dark mb-4">
-          <Store size={24} />
+      <div className="mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-amber/20 text-amber-dark mb-4">
+            <Store size={24} />
+          </div>
+          <h2 className="text-3xl font-serif font-bold text-forest mb-2">Seller Central</h2>
+          <p className="text-mutedText">Manage your listings and track sales.</p>
         </div>
-        <h2 className="text-3xl font-serif font-bold text-forest mb-2">Seller Central</h2>
-        <p className="text-mutedText">Manage your listings and track sales.</p>
+        <button
+          type="button"
+          onClick={handleAutoFill}
+          className="px-3.5 py-2 bg-amber/20 hover:bg-amber text-amber-dark hover:text-forest text-xs font-semibold rounded-xl border border-amber/30 transition-all flex items-center gap-1.5 shadow-sm"
+        >
+          ⚡ Auto-Fill Test Credentials
+        </button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

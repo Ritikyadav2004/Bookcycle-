@@ -4,7 +4,8 @@ const sellerService = {
   // Get seller's own listings with approval statuses (pending, approved, rejected)
   getBooks: async () => {
     const res = await api.get('/seller/books');
-    return res.data?.books || res.data || [];
+    const rawData = res.data || res;
+    return rawData.listings || rawData.books || (Array.isArray(rawData) ? rawData : []);
   },
 
   // Create a new listing with multipart form data (images + book fields)
