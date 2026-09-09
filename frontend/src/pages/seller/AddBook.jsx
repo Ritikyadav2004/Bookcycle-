@@ -51,18 +51,74 @@ const AddBook = () => {
   const [images, setImages] = useState([]);
   const [submitted, setSubmitted] = useState(false);
 
-  const { register, handleSubmit, watch, trigger, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, trigger, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(bookSchema),
     defaultValues: {
-      category: '',
+      title: 'Concepts of Physics (HC Verma) Vol 1',
+      author: 'H.C. Verma',
+      isbn: '978-8177091878',
+      category: 'academic',
+      genre: 'Physics',
+      publisher: 'Bharati Bhawan',
+      edition: '2024 Edition',
+      publicationYear: 2024,
       language: 'English',
       condition: 'good',
+      description: 'Comprehensive physics textbook for Class 11 and JEE preparation. Minimal pencil marks inside, all pages intact.',
+      defects: 'Minor shelf wear on edges, clean pages inside.',
       quantity: 1,
-      publicationYear: 2024,
-      deliveryMethod: 'standard',
+      originalPrice: 450,
+      sellingPrice: 250,
+      city: 'New Delhi',
       state: 'Delhi',
+      postalCode: '110001',
+      deliveryMethod: 'standard',
     },
   });
+
+  const handleAutoFill = () => {
+    reset({
+      title: 'Concepts of Physics (HC Verma) Vol 1',
+      author: 'H.C. Verma',
+      isbn: '978-8177091878',
+      category: 'academic',
+      genre: 'Physics',
+      publisher: 'Bharati Bhawan',
+      edition: '2024 Edition',
+      publicationYear: 2024,
+      language: 'English',
+      condition: 'good',
+      description: 'Comprehensive physics textbook for Class 11 and JEE preparation. Minimal pencil marks inside, all pages intact.',
+      defects: 'Minor shelf wear on edges, clean pages inside.',
+      quantity: 1,
+      originalPrice: 450,
+      sellingPrice: 250,
+      city: 'New Delhi',
+      state: 'Delhi',
+      postalCode: '110001',
+      deliveryMethod: 'standard',
+    });
+
+    if (images.length === 0) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 300;
+      canvas.height = 400;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#1e3a8a';
+      ctx.fillRect(0, 0, 300, 400);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText('HC Verma Vol 1', 40, 200);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const sampleFile = new File([blob], 'hc-verma-sample.jpg', { type: 'image/jpeg' });
+          setImages([{ id: `sample-${Date.now()}`, src: canvas.toDataURL(), name: 'hc-verma-sample.jpg', file: sampleFile }]);
+        }
+      }, 'image/jpeg');
+    }
+
+    toast.success('Sample test data pre-filled!');
+  };
 
   const values = watch();
   const discount = values.originalPrice && values.sellingPrice && values.originalPrice > values.sellingPrice
@@ -162,9 +218,18 @@ const AddBook = () => {
 
   return (
     <div className="mx-auto max-w-5xl pb-24 md:pb-12">
-      <div className="mb-8">
-        <h1 className="section-heading">Add New Book</h1>
-        <p className="text-mutedText">A guided six-step listing flow for marketplace-ready book submissions.</p>
+      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="section-heading">Add New Book</h1>
+          <p className="text-mutedText">A guided six-step listing flow for marketplace-ready book submissions.</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAutoFill}
+          className="px-4 py-2.5 bg-amber/20 hover:bg-amber text-amber-dark hover:text-forest font-semibold text-xs md:text-sm rounded-xl border border-amber/30 transition-all flex items-center gap-2 shadow-sm"
+        >
+          ⚡ Auto-Fill Sample Book for Testing
+        </button>
       </div>
 
       <div className="mb-8 grid grid-cols-2 gap-2 md:grid-cols-6">

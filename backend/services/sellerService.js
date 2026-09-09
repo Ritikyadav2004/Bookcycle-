@@ -133,6 +133,19 @@ const createListing = async (userId, bookData, imageUrls) => {
     }
   }
 
+  // Normalize condition
+  const conditionMap = {
+    "new": "New",
+    "like-new": "Like New",
+    "like new": "Like New",
+    "very-good": "Very Good",
+    "very good": "Very Good",
+    "good": "Good",
+    "fair": "Acceptable",
+    "acceptable": "Acceptable",
+  };
+  const normalizedCondition = conditionMap[condition?.toString().toLowerCase()] || condition || "Good";
+
   // Enforce pending listing status on creation
   const book = await Book.create({
     title,
@@ -146,7 +159,7 @@ const createListing = async (userId, bookData, imageUrls) => {
     publicationYear,
     language,
     description,
-    condition,
+    condition: normalizedCondition,
     defects,
     originalPrice,
     sellingPrice,
