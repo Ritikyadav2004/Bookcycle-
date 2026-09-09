@@ -27,7 +27,9 @@ export const getProducts = (params = {}) => {
       ...b,
       id: b._id || b.id,
       category: b.category?.name || b.category || b.genre || 'General',
-      image: (b.images && b.images[0]) || b.image || '/book-images/placeholder.webp'
+      image: (b.images && b.images.length > 0 && b.images[0]) || b.image || '/book-images/class-12/04-mathematics-part-i.webp',
+      images: (b.images && b.images.length > 0) ? b.images : [(b.image || '/book-images/class-12/04-mathematics-part-i.webp')],
+      available: b.availabilityStatus ? (b.availabilityStatus === 'available' && b.quantity > 0) : (b.quantity === undefined || b.quantity > 0),
     }));
     return {
       data: books,
@@ -48,7 +50,9 @@ export const getProduct = (id) => {
       ...book,
       id: book._id || book.id,
       category: book.category?.name || book.category || book.genre || 'General',
-      image: (book.images && book.images[0]) || book.image || '/book-images/placeholder.webp'
+      image: (book.images && book.images.length > 0 && book.images[0]) || book.image || '/book-images/class-12/04-mathematics-part-i.webp',
+      images: (book.images && book.images.length > 0) ? book.images : [(book.image || '/book-images/class-12/04-mathematics-part-i.webp')],
+      available: book.availabilityStatus ? (book.availabilityStatus === 'available' && book.quantity > 0) : (book.quantity === undefined || book.quantity > 0),
     };
   });
 };
