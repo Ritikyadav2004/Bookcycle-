@@ -12,12 +12,14 @@ const useAuthStore = create(
       isLoading: false,
 
       // Login action
-      login: (userData) => {
+      login: (userData, role, token) => {
+        const finalToken = token || userData?.token || (typeof userData === 'object' ? userData.token : null);
+        const finalRole = role || userData?.role || (typeof userData === 'object' ? userData.role : null) || 'buyer';
         set({
           user: userData,
-          token: userData.token || 'mock-token-' + Date.now(),
-          isAuthenticated: true,
-          role: userData.role,
+          token: finalToken,
+          isAuthenticated: Boolean(finalToken && !finalToken.startsWith('mock-token-')),
+          role: finalRole,
         });
       },
 

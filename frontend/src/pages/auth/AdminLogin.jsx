@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import useAuthStore from '../../store/authStore';
+import { authService } from '../../services/authService';
 
 const schema = z.object({
   email: z.string().email('Enter a valid admin email'),
@@ -17,13 +18,18 @@ const AdminLogin = () => {
   const login = useAuthStore((state) => state.login);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { email: 'admin@bookcycle.in', password: 'admin123' },
+    defaultValues: { email: 'admin@bookcycle.com', password: 'adminpassword123' },
   });
 
   const onSubmit = async (data) => {
-    login({ name: 'BookCycle Admin', email: data.email, role: 'admin' });
-    toast.success('Admin signed in');
-    navigate('/admin/dashboard');
+    try {
+      const user = await authService.loginAdmin(data);
+      login(user);
+      toast.success('Admin signed in successfully');
+      navigate('/admin/dashboard');
+    } catch (error) {
+      toast.error(error.message || 'Admin login failed');
+    }
   };
 
   return (
