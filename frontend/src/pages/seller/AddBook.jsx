@@ -101,20 +101,20 @@ const AddBook = () => {
 
     if (images.length === 0) {
       const canvas = document.createElement('canvas');
-      canvas.width = 300;
-      canvas.height = 400;
+      canvas.width = 150;
+      canvas.height = 200;
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#1e3a8a';
-      ctx.fillRect(0, 0, 300, 400);
+      ctx.fillRect(0, 0, 150, 200);
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 22px sans-serif';
-      ctx.fillText('HC Verma Vol 1', 40, 200);
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('HC Verma Vol 1', 20, 100);
       canvas.toBlob((blob) => {
         if (blob) {
-          const sampleFile = new File([blob], 'hc-verma-sample.jpg', { type: 'image/jpeg' });
-          setImages([{ id: `sample-${Date.now()}`, src: canvas.toDataURL(), name: 'hc-verma-sample.jpg', file: sampleFile }]);
+          const sampleFile = new File([blob], 'sample.jpg', { type: 'image/jpeg' });
+          setImages([{ id: `sample-${Date.now()}`, src: canvas.toDataURL('image/jpeg', 0.5), name: 'sample.jpg', file: sampleFile }]);
         }
-      }, 'image/jpeg');
+      }, 'image/jpeg', 0.5);
     }
 
     toast.success('Sample test data pre-filled!');

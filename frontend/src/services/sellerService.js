@@ -10,6 +10,7 @@ const sellerService = {
   // Create a new listing with multipart form data (images + book fields)
   createListing: async (formData) => {
     const res = await api.post('/seller/books', formData, {
+      timeout: 120000,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -20,6 +21,7 @@ const sellerService = {
   // Update an existing listing
   updateListing: async (bookId, formData) => {
     const res = await api.put(`/seller/books/${bookId}`, formData, {
+      timeout: 120000,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
