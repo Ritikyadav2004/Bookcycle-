@@ -112,28 +112,39 @@ const createListing = async (userId, bookData, imageUrls) => {
   } = bookData;
 
   // Generate unique slug
-  const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const baseSlug = (title || "book").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   const randomSuffix = Math.floor(1000 + Math.random() * 9000);
   const slug = `${baseSlug}-${randomSuffix}`;
 
-  // Resolve category if slug or name passed instead of ObjectId
-  let categoryId = category;
-  if (!mongoose.Types.ObjectId.isValid(category)) {
-    const foundCategory = await Category.findOne({
+  // Robustly resolve category ObjectId
+  let categoryId = null;
+  if (category && mongoose.Types.ObjectId.isValid(category)) {
+    categoryId = category;
+  } else {
+    const searchSlug = (category || "").toString().toLowerCase().trim();
+    let foundCategory = await Category.findOne({
       $or: [
-        { slug: category?.toString().toLowerCase() },
-        { name: new RegExp(`^${category}$`, "i") }
+        { slug: searchSlug },
+        { name: new RegExp(`^${searchSlug}$`, "i") }
       ]
     });
-    if (foundCategory) {
-      categoryId = foundCategory._id;
-    } else {
-      const defaultCategory = await Category.findOne({});
-      if (defaultCategory) categoryId = defaultCategory._id;
+    if (!foundCategory) {
+      foundCategory = await Category.findOne({});
     }
+    if (!foundCategory) {
+      const catName = category ? (category.charAt(0).toUpperCase() + category.slice(1)) : "General";
+      foundCategory = await Category.create({
+        name: catName,
+        slug: searchSlug || "general",
+        description: "General Book Category",
+        status: "active"
+      });
+    }
+    categoryId = foundCategory._id;
   }
 
-  // Normalize condition
+  // Normalize condition against allowed schema enum: ["New", "Like New", "Very Good", "Good", "Acceptable"]
+  const validConditions = ["New", "Like New", "Very Good", "Good", "Acceptable"];
   const conditionMap = {
     "new": "New",
     "like-new": "Like New",
@@ -144,32 +155,43 @@ const createListing = async (userId, bookData, imageUrls) => {
     "fair": "Acceptable",
     "acceptable": "Acceptable",
   };
-  const normalizedCondition = conditionMap[condition?.toString().toLowerCase()] || condition || "Good";
+  let normalizedCondition = conditionMap[condition?.toString().toLowerCase()] || condition || "Good";
+  if (!validConditions.includes(normalizedCondition)) {
+    normalizedCondition = "Good";
+  }
+
+  const numOriginalPrice = Number(originalPrice) || 0;
+  const numSellingPrice = Number(sellingPrice) || 0;
+  const numQuantity = Number(quantity) || 1;
+  const numPubYear = publicationYear ? Number(publicationYear) : undefined;
+  const deliveryArr = Array.isArray(deliveryMethods)
+    ? deliveryMethods
+    : [deliveryMethods || "Courier"];
 
   // Enforce pending listing status on creation
   const book = await Book.create({
     title,
     slug,
-    author,
-    isbn,
+    author: author || "Unknown Author",
+    isbn: isbn || "",
     category: categoryId,
-    genre,
-    publisher,
-    edition,
-    publicationYear,
-    language,
-    description,
+    genre: genre || "",
+    publisher: publisher || "",
+    edition: edition || "",
+    publicationYear: numPubYear,
+    language: language || "English",
+    description: description || "",
     condition: normalizedCondition,
-    defects,
-    originalPrice,
-    sellingPrice,
-    quantity: quantity || 1,
+    defects: defects || "",
+    originalPrice: numOriginalPrice,
+    sellingPrice: numSellingPrice,
+    quantity: numQuantity,
     images: imageUrls || [],
     seller: userId,
-    sellerLocation,
-    deliveryMethods,
+    sellerLocation: sellerLocation || "",
+    deliveryMethods: deliveryArr,
     approvalStatus: "pending",
-    availabilityStatus: (quantity && quantity > 0) ? "available" : "out_of_stock",
+    availabilityStatus: (numQuantity > 0) ? "available" : "out_of_stock",
   });
 
   await notifyAdminsOfNewListing(book);
