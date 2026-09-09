@@ -37,9 +37,13 @@ api.interceptors.response.use(
     // Handle 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      // Handle token refresh logic here if needed
+      const currentRole = useAuthStore.getState().role;
       useAuthStore.getState().logout();
-      window.location.href = '/login';
+      if (currentRole === 'admin' || window.location.pathname.startsWith('/admin')) {
+        window.location.href = '/admin/login';
+      } else {
+        window.location.href = '/login';
+      }
     }
     
     // Format error message consistently
