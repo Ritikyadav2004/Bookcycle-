@@ -21,20 +21,54 @@ dotenv.config();
 
 const app = express();
 
-// Set security headers
-app.use(helmet());
+// Set security headers (disable CORP so cross-origin frontends like Vercel can fetch API data)
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
 
 // Cookie parser middleware
 app.use(cookieParser());
+
+// Allowed origins list
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
+  'https://bookcycle-topaz.vercel.app',
+  process.env.CLIENT_URL,
+].filter(Boolean);
 
 // Enable CORS
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    return callback(null, origin);
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      origin.includes('localhost')
+    ) {
+      return callback(null, true);
+    }
+    // Fallback: allow origin during development and testing
+    return callback(null, true);
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
 }));
+
+// Preflight handler to ensure OPTIONS requests always succeed
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Logger middleware
 if (process.env.NODE_ENV !== 'test') {

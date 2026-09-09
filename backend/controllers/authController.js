@@ -4,18 +4,20 @@ const AppError = require("../utils/appError");
 
 // Helper to set HTTP-Only Cookies
 const setTokenCookies = (res, accessToken, refreshToken) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
   const cookieOptionsAccess = {
     expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   };
 
   const cookieOptionsRefresh = {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   };
 
   res.cookie("access_token", accessToken, cookieOptionsAccess);
@@ -23,8 +25,9 @@ const setTokenCookies = (res, accessToken, refreshToken) => {
 };
 
 const clearTokenCookies = (res) => {
-  res.clearCookie("access_token", { httpOnly: true, sameSite: "strict" });
-  res.clearCookie("refresh_token", { httpOnly: true, sameSite: "strict" });
+  const isProduction = process.env.NODE_ENV === "production";
+  res.clearCookie("access_token", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax" });
+  res.clearCookie("refresh_token", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax" });
 };
 
 const register = async (req, res, next) => {

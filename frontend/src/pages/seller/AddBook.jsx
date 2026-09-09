@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { Book, Camera, CheckCircle, FileText, IndianRupee, Loader2, MapPin, PackageCheck, RotateCcw, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { CATEGORIES, DELIVERY_METHODS, INDIAN_STATES, LANGUAGES } from '../../constants';
+import sellerService from '../../services/sellerService';
 
 const bookSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -76,7 +77,7 @@ const AddBook = () => {
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => setImages((current) => [...current, { id: `${file.name}-${Date.now()}`, src: reader.result, name: file.name }]);
+      reader.onloadend = () => setImages((current) => [...current, { id: `${file.name}-${Date.now()}`, src: reader.result, name: file.name, file }]);
       reader.readAsDataURL(file);
     });
   };
@@ -96,9 +97,49 @@ const AddBook = () => {
       toast.error('Upload at least one book image');
       return;
     }
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setSubmitted(true);
-    toast.success('Submitted for Admin Approval');
+
+    try {
+      const data = watch();
+      const formData = new FormData();
+
+      formData.append('title', data.title);
+      formData.append('author', data.author);
+      if (data.isbn) formData.append('isbn', data.isbn);
+      formData.append('category', data.category);
+      formData.append('genre', data.genre);
+      formData.append('publisher', data.publisher);
+      formData.append('edition', data.edition);
+      formData.append('publicationYear', data.publicationYear);
+      formData.append('language', data.language);
+
+      const conditionMap = {
+        'like-new': 'Like New',
+        'good': 'Good',
+        'fair': 'Acceptable',
+        'acceptable': 'Acceptable',
+      };
+      formData.append('condition', conditionMap[data.condition] || 'Good');
+      formData.append('description', data.description);
+      if (data.defects) formData.append('defects', data.defects);
+      formData.append('quantity', data.quantity);
+      formData.append('originalPrice', data.originalPrice);
+      formData.append('sellingPrice', data.sellingPrice);
+      formData.append('sellerLocation', `${data.city}, ${data.state}`);
+      formData.append('deliveryMethods', data.deliveryMethod);
+
+      images.forEach((img) => {
+        if (img.file) {
+          formData.append('images', img.file);
+        }
+      });
+
+      await sellerService.createListing(formData);
+      setSubmitted(true);
+      toast.success('Book submitted for Admin Approval!');
+    } catch (err) {
+      console.error('Failed to submit listing:', err);
+      toast.error(err?.message || 'Failed to submit book listing');
+    }
   };
 
   if (submitted) {

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const Book = require("../models/book");
+const Category = require("../models/category");
 const Order = require("../models/order");
 const Notification = require("../models/notification");
 const AppError = require("../utils/appError");
@@ -115,13 +116,30 @@ const createListing = async (userId, bookData, imageUrls) => {
   const randomSuffix = Math.floor(1000 + Math.random() * 9000);
   const slug = `${baseSlug}-${randomSuffix}`;
 
+  // Resolve category if slug or name passed instead of ObjectId
+  let categoryId = category;
+  if (!mongoose.Types.ObjectId.isValid(category)) {
+    const foundCategory = await Category.findOne({
+      $or: [
+        { slug: category?.toString().toLowerCase() },
+        { name: new RegExp(`^${category}$`, "i") }
+      ]
+    });
+    if (foundCategory) {
+      categoryId = foundCategory._id;
+    } else {
+      const defaultCategory = await Category.findOne({});
+      if (defaultCategory) categoryId = defaultCategory._id;
+    }
+  }
+
   // Enforce pending listing status on creation
   const book = await Book.create({
     title,
     slug,
     author,
     isbn,
-    category,
+    category: categoryId,
     genre,
     publisher,
     edition,

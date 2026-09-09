@@ -15,28 +15,29 @@ const getHeaders = () => {
 
 export const getProducts = (params = {}) => {
   const query = new URLSearchParams(params).toString();
-  const url = `${BASE_URL}/products${query ? `?${query}` : ''}`;
+  const url = `${BASE_URL}/books${query ? `?${query}` : ''}`;
   return fetch(url, {
     headers: getHeaders()
   }).then(res => {
-    if (!res.ok) throw new Error('Failed to fetch products');
+    if (!res.ok) throw new Error('Failed to fetch books');
     return res.json();
   }).then(json => {
-    const books = (json.data || []).map(b => ({
+    const rawList = Array.isArray(json.data) ? json.data : (json.data?.books || []);
+    const books = rawList.map(b => ({
       ...b,
       id: b._id || b.id,
-      category: b.category?.name || b.category || 'General',
-      image: b.images?.[0] || b.image || '/book-images/placeholder.webp'
+      category: b.category?.name || b.category || b.genre || 'General',
+      image: (b.images && b.images[0]) || b.image || '/book-images/placeholder.webp'
     }));
     return {
       data: books,
-      totalPages: json.pagination?.pages || 1
+      totalPages: json.meta?.pages || json.pagination?.pages || 1
     };
   });
 };
 
 export const getProduct = (id) => {
-  return fetch(`${BASE_URL}/products/${id}`, {
+  return fetch(`${BASE_URL}/books/${id}`, {
     headers: getHeaders()
   }).then(res => {
     if (!res.ok) throw new Error('Failed to fetch book details');
@@ -46,17 +47,20 @@ export const getProduct = (id) => {
     return {
       ...book,
       id: book._id || book.id,
-      category: book.category?.name || book.category || 'General',
-      image: book.images?.[0] || book.image || '/book-images/placeholder.webp'
+      category: book.category?.name || book.category || book.genre || 'General',
+      image: (book.images && book.images[0]) || book.image || '/book-images/placeholder.webp'
     };
   });
 };
 
 export const addToCart = (item) => {
-  return fetch(`${BASE_URL}/cart/add`, {
+  return fetch(`${BASE_URL}/cart`, {
     method: 'POST',
     headers: getHeaders(),
-    body: JSON.stringify(item)
+    body: JSON.stringify({
+      bookId: item.bookId || item.id || item._id,
+      quantity: item.quantity || 1
+    })
   }).then(res => {
     if (!res.ok) throw new Error('Failed to add item to cart');
     return res.json();
