@@ -19,9 +19,21 @@ const BuyerLogin = () => {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/buyer/dashboard';
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: 'buyer1@test.com',
+      password: 'buyerpassword123',
+    },
   });
+
+  const handleAutoFill = () => {
+    reset({
+      email: 'buyer1@test.com',
+      password: 'buyerpassword123',
+    });
+    toast.success('Buyer test credentials pre-filled!');
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -36,9 +48,18 @@ const BuyerLogin = () => {
 
   return (
     <div className="w-full">
-      <div className="mb-10 text-center md:text-left">
-        <h2 className="text-3xl font-serif font-bold text-forest mb-2">Welcome Back</h2>
-        <p className="text-mutedText">Log in to your buyer account to continue</p>
+      <div className="mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-3xl font-serif font-bold text-forest mb-2">Welcome Back</h2>
+          <p className="text-mutedText">Log in to your buyer account to continue</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAutoFill}
+          className="px-3.5 py-2 bg-emerald/10 hover:bg-emerald text-emerald hover:text-white text-xs font-semibold rounded-xl border border-emerald/20 transition-all flex items-center gap-1.5 shadow-sm"
+        >
+          ⚡ Auto-Fill Test Credentials
+        </button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
